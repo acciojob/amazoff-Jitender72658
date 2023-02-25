@@ -7,8 +7,11 @@ import java.util.List;
 
 @org.springframework.stereotype.Service
 public class Service {
-    @Autowired
-    Repository repository;
+    public Service(){
+
+    }
+    //@Autowired
+    Repository repository = new Repository();
     public void add_order(Order order){
         repository.add_order(order);
     }

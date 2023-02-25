@@ -1,6 +1,5 @@
 package com.driver;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("orders")
 public class OrderController {
-    @Autowired
-    Service service;
+    //@Autowired
+    Service service = new Service();
+
+    OrderController(){
+
+    }
     @PostMapping("/add-order")
     public ResponseEntity<String> addOrder(@RequestBody Order order){
             service.add_order(order);

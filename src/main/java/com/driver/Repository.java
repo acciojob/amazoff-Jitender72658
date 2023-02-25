@@ -4,18 +4,24 @@ import io.swagger.models.auth.In;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.OptionalDouble;
+
 
 @org.springframework.stereotype.Repository
 public class Repository {
-   private HashMap<String,Order> hmOrder;
-   private HashMap<String,DeliveryPartner> hmDeliveryPartner;
-   private HashMap<String,String> hmOrderPartnerPair;
-  private   HashMap<String,List<String >> hmPartnerListOrder;
+   private static HashMap<String,Order> hmOrder;
+   private static HashMap<String,DeliveryPartner> hmDeliveryPartner;
+   private static HashMap<String,String> hmOrderPartnerPair;
+  private static   HashMap<String,List<String >> hmPartnerListOrder;
+
+    public Repository(){
+        hmOrder = new HashMap<>();
+        hmDeliveryPartner = new HashMap<>();
+        hmOrderPartnerPair = new HashMap<>();
+        hmPartnerListOrder = new HashMap<>();
+    }
     public void add_order(Order order){
 
         hmOrder.put(order.getId(),order);
@@ -26,9 +32,16 @@ public class Repository {
     }
 
     public void add_order_partner_pair(String orderId,  String partnerId){
+        if(orderId==null) return;
         hmOrderPartnerPair.put(orderId,partnerId);
+        if(!hmDeliveryPartner.containsKey(partnerId)){
+            hmDeliveryPartner.put(partnerId,new DeliveryPartner(partnerId));
+        }
         hmDeliveryPartner.get(partnerId).setNumberOfOrders(hmDeliveryPartner.get(partnerId).getNumberOfOrders()+1);
         List<String> list = hmPartnerListOrder.get(partnerId);
+        if(list==null){
+            list = new ArrayList<>();
+        }
         list.add(orderId);
         hmPartnerListOrder.put(partnerId,list);
     }
@@ -47,6 +60,9 @@ public class Repository {
     }
 
     public Integer get_order_count_by_partner_id(String partnerId){
+        if(!hmDeliveryPartner.containsKey(partnerId)){
+            hmDeliveryPartner.put(partnerId,new DeliveryPartner(partnerId));
+        }
          return hmDeliveryPartner.get(partnerId).getNumberOfOrders();
     }
     public List<String> get_orders_by_partner_id(String partnerId){
