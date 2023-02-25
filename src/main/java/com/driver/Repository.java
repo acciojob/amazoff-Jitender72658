@@ -14,7 +14,7 @@ public class Repository {
    private static HashMap<String,Order> hmOrder;
    private static HashMap<String,DeliveryPartner> hmDeliveryPartner;
    private static HashMap<String,String> hmOrderPartnerPair;
-  private static   HashMap<String,List<String >> hmPartnerListOrder;
+  private static   HashMap<String,List<String>> hmPartnerListOrder;
 
     public Repository(){
         hmOrder = new HashMap<>();
@@ -66,7 +66,7 @@ public class Repository {
          return hmDeliveryPartner.get(partnerId).getNumberOfOrders();
     }
     public List<String> get_orders_by_partner_id(String partnerId){
-        List<String > orderList = new ArrayList<>(hmPartnerListOrder.keySet());
+        List<String > orderList = hmPartnerListOrder.get(partnerId);
         return orderList;
     }
 
@@ -111,6 +111,7 @@ public class Repository {
     }
 
     public void delete_partner_by_id(String partnerId){
+        if(!hmDeliveryPartner.containsValue(partnerId)) return ;
         List<String > orders = hmPartnerListOrder.get(partnerId);
         for(String orderId: orders){
            hmOrderPartnerPair.remove(orderId);
@@ -120,6 +121,7 @@ public class Repository {
     }
 
     public void delete_order_by_id(String orderId){
+        if(!hmOrder.containsKey(orderId)) return;
         int orderDeleted = 0;
         List<String> orderList = hmPartnerListOrder.get(hmOrderPartnerPair.get(orderId));
         for(int i =0;i<orderList.size();i++){
@@ -131,6 +133,7 @@ public class Repository {
         int noOfOrders = hmDeliveryPartner.get(hmOrderPartnerPair.get(orderId)).getNumberOfOrders();
         hmDeliveryPartner.get(hmOrderPartnerPair.get(orderId)).setNumberOfOrders(noOfOrders-orderDeleted);
         hmOrderPartnerPair.remove(orderId);
+        hmOrder.remove(orderId);
     }
 
 
