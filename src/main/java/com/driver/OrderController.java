@@ -21,7 +21,7 @@ public class OrderController {
     //@Autowired
     Service service = new Service();
 
-    OrderController(){
+   public OrderController(){
 
     }
     @PostMapping("/add-order")
