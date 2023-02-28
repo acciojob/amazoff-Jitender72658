@@ -10,8 +10,8 @@ public class OrderService {
     public OrderService(){
 
     }
-    //@Autowired
-    OrderRepository repository = new OrderRepository() ;
+    @Autowired
+    OrderRepository repository;
     public void add_order(Order order){
         repository.add_order(order);
     }
