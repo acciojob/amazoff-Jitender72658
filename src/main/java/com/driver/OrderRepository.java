@@ -99,7 +99,7 @@ public class OrderRepository {
             minutes = "0"+minutes;
         }
 
-        String lastDelivery = minutes+hours;
+        String lastDelivery =hours +":"+minutes;
         return lastDelivery;
     }
 
