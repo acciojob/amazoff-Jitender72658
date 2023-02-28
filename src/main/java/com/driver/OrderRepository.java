@@ -1,22 +1,18 @@
 package com.driver;
 
-import io.swagger.models.auth.In;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-
-@org.springframework.stereotype.Repository
-public class Repository {
+@Repository
+public class OrderRepository {
    private static HashMap<String,Order> hmOrder;
    private static HashMap<String,DeliveryPartner> hmDeliveryPartner;
    private static HashMap<String,String> hmOrderPartnerPair;
   private static   HashMap<String,List<String>> hmPartnerListOrder;
 
-    public Repository(){
+    public OrderRepository(){
         hmOrder = new HashMap<>();
         hmDeliveryPartner = new HashMap<>();
         hmOrderPartnerPair = new HashMap<>();
@@ -32,37 +28,29 @@ public class Repository {
     }
 
     public void add_order_partner_pair(String orderId,  String partnerId){
-        if(orderId==null) return;
-        hmOrderPartnerPair.put(orderId,partnerId);
-        if(!hmDeliveryPartner.containsKey(partnerId)){
-            hmDeliveryPartner.put(partnerId,new DeliveryPartner(partnerId));
+        if(!hmOrder.containsKey(orderId) && hmDeliveryPartner.containsKey(partnerId)){
+            return;
         }
-        hmDeliveryPartner.get(partnerId).setNumberOfOrders(hmDeliveryPartner.get(partnerId).getNumberOfOrders()+1);
-        List<String> list = hmPartnerListOrder.get(partnerId);
-        if(list==null){
-            list = new ArrayList<>();
+        hmOrderPartnerPair.put(orderId,partnerId);
+        int noOfOrders = hmDeliveryPartner.get(partnerId).getNumberOfOrders();
+        hmDeliveryPartner.get(partnerId).setNumberOfOrders(noOfOrders+1);
+        List<String> list = new ArrayList<>();
+                hmPartnerListOrder.get(partnerId);
+        if(hmPartnerListOrder.containsKey(partnerId)){
+            list = hmPartnerListOrder.get(partnerId);
         }
         list.add(orderId);
         hmPartnerListOrder.put(partnerId,list);
     }
     public Order get_order_form_id(String orderId){
-        if(hmOrder.containsKey(orderId)){
             return hmOrder.get(orderId);
-        }
-        return null;
     }
 
     public DeliveryPartner get_partner_form_id(String partnerId){
-        if(hmDeliveryPartner.containsKey(partnerId)){
             return hmDeliveryPartner.get(partnerId);
-        }
-        return null;
     }
 
     public Integer get_order_count_by_partner_id(String partnerId){
-        if(!hmDeliveryPartner.containsKey(partnerId)){
-            hmDeliveryPartner.put(partnerId,new DeliveryPartner(partnerId));
-        }
          return hmDeliveryPartner.get(partnerId).getNumberOfOrders();
     }
     public List<String> get_orders_by_partner_id(String partnerId){
@@ -76,10 +64,7 @@ public class Repository {
     }
 
     public Integer get_count_of_unassigned_orders(){
-        int assignedOrders = hmPartnerListOrder.size();
-//        for(String partnerId: hmDeliveryPartner.keySet()){
-//            assignedOrders += hmDeliveryPartner.get(partnerId).getNumberOfOrders();
-//        }
+        int assignedOrders = hmOrderPartnerPair.size();
         int totalOrders = hmOrder.size();
         return totalOrders-assignedOrders;
     }
@@ -98,26 +83,32 @@ public class Repository {
 
     public String get_last_delivery_time(String partnerId){
         List<String > orders = hmPartnerListOrder.get(partnerId);
-        int lastDelivery = 0;
+        int lastDeliveryTime = 0;
         for(String orderId: orders){
-            if(hmOrder.get(orderId).getDeliveryTime()>lastDelivery){
-                lastDelivery = hmOrder.get(orderId).getDeliveryTime();
+            if(hmOrder.get(orderId).getDeliveryTime()>lastDeliveryTime){
+                lastDeliveryTime = hmOrder.get(orderId).getDeliveryTime();
             }
         }
-        int hour = lastDelivery/60;
-        int minutes = lastDelivery%60;
-        String lastDeliveryTime = hour<10?("0"+hour+":"+minutes):(""+hour+":"+minutes);
-        return lastDeliveryTime;
+        String hours = String.valueOf(lastDeliveryTime/60);
+        String minutes = String.valueOf(lastDeliveryTime%60);
+        if(hours.length()<2){
+            hours = "0"+hours;
+        }
+        if(minutes.length()<2){
+            minutes = "0"+minutes;
+        }
+
+        String lastDelivery = minutes+hours;
+        return lastDelivery;
     }
 
     public void delete_partner_by_id(String partnerId){
-        if(!hmDeliveryPartner.containsValue(partnerId)) return ;
         List<String > orders = hmPartnerListOrder.get(partnerId);
+        hmPartnerListOrder.remove(partnerId);
+        hmDeliveryPartner.remove(partnerId);
         for(String orderId: orders){
            hmOrderPartnerPair.remove(orderId);
         }
-        hmPartnerListOrder.remove(partnerId);
-        hmDeliveryPartner.remove(partnerId);
     }
 
     public void delete_order_by_id(String orderId){

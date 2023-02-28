@@ -1,17 +1,17 @@
 package com.driver;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+@Service
 
-@org.springframework.stereotype.Service
-public class Service {
-    public Service(){
+public class OrderService {
+    public OrderService(){
 
     }
-    //@Autowired
-    Repository repository = new Repository();
+    @Autowired
+    OrderRepository repository ;
     public void add_order(Order order){
         repository.add_order(order);
     }
